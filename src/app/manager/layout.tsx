@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Students Manager | Manager",
@@ -12,8 +11,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main>
+    <html lang="en">
       <body>{children}</body>
-    </main>
+    </html>
   );
 }
