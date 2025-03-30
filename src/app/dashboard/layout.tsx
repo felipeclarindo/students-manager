@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Students Manager | Home",
+  title: "Students Manager | Dashboard",
   description: "Web Application for managing students",
 };
 
@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <main>
       <body>{children}</body>
-    </html>
+    </main>
   );
 }
