@@ -7,26 +7,23 @@ import {
 } from "@/components/ui/dialog";
 import { NotesModalProps } from "@/interfaces";
 
-export const NotesModal = ({
-  isOpen,
-  onClose,
-  student,
-  notes,
-}: NotesModalProps) => {
+export const NotesModal = ({ isOpen, onClose, student }: NotesModalProps) => {
   if (!student) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Notas de {student.name}</DialogTitle>
+          <DialogTitle className="font-normal">
+            Notas de <span className="font-bold">{student.name}</span>
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-2">
           {student.notes && student.notes.length > 0 ? (
             <ul className="list-disc list-inside">
-              {notes?.map((note) => (
+              {student.notes.map((note, index) => (
                 <li key={note.id} className="text-gray-700">
-                  Nota: {note.value}
+                  Nota {index + 1}: {note.value}
                 </li>
               ))}
             </ul>

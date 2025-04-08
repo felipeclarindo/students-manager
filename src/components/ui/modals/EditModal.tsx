@@ -1,23 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { StudentProps } from "@/interfaces";
-import { useStudentById, editStudent } from "@/actions/students-actions";
+import { useEffect, useState } from "react";
+import { EditModalProps, StudentProps } from "@/interfaces";
+import { editStudent } from "@/actions/students-actions";
 import { CustomButton } from "@/components/CustomButton";
 import { ErrorNotification } from "@/components/ui/ErrorNotification";
 import { SuccessNotification } from "@/components/ui/SuccessNotification";
-
-interface EditModalProps {
-  isOpenModal: boolean;
-  onClose: () => void;
-  studentId: number;
-  onSuccess?: () => void;
-}
+import { getChangedFields } from "@/utils/compareObjects";
 
 export const EditModal = ({
   isOpenModal,
   onClose,
-  studentId,
+  student,
   onSuccess,
 }: EditModalProps) => {
   const [name, setName] = useState("");
@@ -28,16 +22,15 @@ export const EditModal = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const student = useStudentById(studentId.toString());
-
   useEffect(() => {
     if (isOpenModal && student) {
-      setName(student.student?.name ?? "");
-      setCourse(student?.student?.course ?? "");
-      setPeriod(student.student?.period ?? "");
-      setNotes(
-        Array.isArray(student.student?.notes) ? student.student.notes : []
-      );
+      setName(student.name || "");
+      setCourse(student.course || "");
+      setPeriod(student.period || "");
+      setNotes(Array.isArray(student.notes) ? student.notes : []);
+      setNotesInput("");
+      setErrorMessage(null);
+      setSuccessMessage(null);
     }
   }, [isOpenModal, student]);
 
@@ -58,60 +51,63 @@ export const EditModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!student) return;
 
-    const updatedStudent: Partial<StudentProps> = {
+    const updatedData: StudentProps = {
+      ...student,
       name,
       course,
       period,
-      notes: notes.length > 0 ? notes : null,
+      notes,
     };
 
+    const changes = getChangedFields(student, updatedData);
+
+    if (Object.keys(changes).length === 0) {
+      setErrorMessage("No changes detected.");
+      return;
+    }
+
     try {
-      const result = await editStudent(studentId.toString(), updatedStudent);
+      const result = await editStudent(student.id.toString(), changes);
       if (result?.error) {
         setErrorMessage(result.error);
       } else {
         setSuccessMessage("Student updated successfully!");
-        if (onSuccess) onSuccess();
         setTimeout(() => {
-          setSuccessMessage(null);
+          if (onSuccess) onSuccess();
           onClose();
-        }, 2000);
+        }, 1000);
       }
     } catch (err) {
       setErrorMessage("An unexpected error occurred.");
     }
   };
 
+  // ⛔ evita renderizar o modal se não for necessário
+  if (!isOpenModal || !student) return null;
+
   return (
-    <div
-      className={`fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 ${
-        isOpenModal ? "" : "hidden"
-      }`}
-    >
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
         {errorMessage && (
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
-            <ErrorNotification
-              addClass="animate-slide-in w-[300px]"
-              message={errorMessage}
-              onClose={() => setErrorMessage(null)}
-            />
-          </div>
+          <ErrorNotification
+            addClass="absolute top-2 left-1/2 transform -translate-x-1/2 z-50"
+            message={errorMessage}
+            onClose={() => setErrorMessage(null)}
+          />
         )}
 
         {successMessage && (
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50">
-            <SuccessNotification
-              addClass="animate-slide-in w-[300px]"
-              message={successMessage}
-              onClose={() => setSuccessMessage(null)}
-            />
-          </div>
+          <SuccessNotification
+            addClass="absolute top-2 left-1/2 transform -translate-x-1/2 z-50"
+            message={successMessage}
+            onClose={() => setSuccessMessage(null)}
+          />
         )}
 
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold mb-4">Edit Student</h2>
+          <h2 className="text-xl font-semibold">Edit Student</h2>
           <CustomButton
             addClass="bg-[#2e2222] hover:bg-[#2e2222]"
             text="X"
@@ -130,10 +126,10 @@ export const EditModal = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="border border-gray-500 rounded-md p-2 w-full"
-              placeholder="Enter student name"
               required
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="course" className="block text-sm font-bold mb-1">
               Course
@@ -144,10 +140,10 @@ export const EditModal = ({
               value={course}
               onChange={(e) => setCourse(e.target.value)}
               className="border border-gray-500 rounded-md p-2 w-full"
-              placeholder="Enter course name"
               required
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="period" className="block text-sm font-bold mb-1">
               Period
@@ -158,13 +154,13 @@ export const EditModal = ({
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
               className="border border-gray-500 rounded-md p-2 w-full"
-              placeholder="Enter period type"
               required
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="notes" className="block text-sm font-bold mb-1">
-              Add Note (numeric)
+              Add Note (0-10)
             </label>
             <div className="flex gap-2">
               <input
@@ -175,7 +171,6 @@ export const EditModal = ({
                 value={notesInput}
                 onChange={(e) => setNotesInput(e.target.value)}
                 className="border border-gray-500 rounded-md p-2 w-full"
-                placeholder="Enter note (0-10)"
               />
               <CustomButton text="+" onClick={handleAddNote} type="button" />
             </div>

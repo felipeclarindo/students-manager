@@ -8,22 +8,33 @@ import { EditModal } from "@/components/ui/modals/EditModal";
 import { DeleteConfirmation } from "./ui/DeleteConfirmation";
 import { NotesModal } from "./ui/modals/NotesModal";
 
-export const StudentItem = (student: StudentProps) => {
+export const StudentItem = ({
+  id,
+  name,
+  course,
+  period,
+  notes,
+  onEdit,
+}: StudentProps & { onEdit: () => void }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
 
-  const handleEditClick = () => setIsEditModalOpen(true);
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+    onEdit();
+  };
+
   const handleDeleteClick = () => setIsDeleteModalOpen(true);
   const handleViewNotes = () => setIsNotesModalOpen(true);
 
   const confirmDelete = async () => {
-    if (student.id === undefined) {
+    if (id === undefined) {
       alert("Student ID is undefined.");
       return;
     }
 
-    const result = await deleteStudent(student.id.toString());
+    const result = await deleteStudent(id.toString());
     if (result.error) {
       alert(result.error);
     } else {
@@ -34,14 +45,14 @@ export const StudentItem = (student: StudentProps) => {
   return (
     <>
       <tr>
-        <td className="border px-4 py-2 text-center">{student.id}</td>
-        <td className="border px-4 py-2 text-center">{student.name}</td>
-        <td className="border px-4 py-2 text-center">{student.course}</td>
-        <td className="border px-4 py-2 text-center">{student.period}</td>
+        <td className="border px-4 py-2 text-center">{id}</td>
+        <td className="border px-4 py-2 text-center">{name}</td>
+        <td className="border px-4 py-2 text-center">{course}</td>
+        <td className="border px-4 py-2 text-center">{period}</td>
         <td className="border px-4 py-2 text-center">
           <button
             onClick={handleViewNotes}
-            className="text-blue-600 hover:underline"
+            className="text-black cursor-pointer underline transition-all duration-300 ease-in-out hover:opacity-40"
           >
             Ver Notas
           </button>
@@ -54,11 +65,11 @@ export const StudentItem = (student: StudentProps) => {
         </td>
       </tr>
 
-      {isEditModalOpen && student.id !== undefined && (
+      {isEditModalOpen && id !== undefined && (
         <EditModal
           isOpenModal={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          studentId={student.id}
+          student={{ id, name, course, period, notes }}
         />
       )}
 
@@ -77,17 +88,17 @@ export const StudentItem = (student: StudentProps) => {
           isOpen={isNotesModalOpen}
           onClose={() => setIsNotesModalOpen(false)}
           student={{
-            name: student.name,
-            notes: student.notes
-              ? student.notes.map((note, index) => ({
+            name: name,
+            notes: notes
+              ? notes.map((note, index) => ({
                   id: index.toString(),
                   value: note,
                 }))
               : undefined,
           }}
           notes={
-            student.notes
-              ? student.notes.map((note, index) => ({
+            notes
+              ? notes.map((note, index) => ({
                   id: index.toString(),
                   value: note,
                 }))

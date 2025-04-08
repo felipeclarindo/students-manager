@@ -7,7 +7,7 @@ export const CustomButton = (props: CustomButtonProps) => {
         props.customClass ??
         `${
           props.addClass ?? ""
-        }bg-amber-950 hover:bg-amber-900 text-white transition-all duration-300 ease-in-out 
+        }bg-amber-950 hover:bg-amber-900 text-white transition-all cursor-pointer duration-300 ease-in-out 
         `
       }`}
       type={props.type ?? "button"}
