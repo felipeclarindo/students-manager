@@ -76,8 +76,23 @@ export const StudentItem = (student: StudentProps) => {
         <NotesModal
           isOpen={isNotesModalOpen}
           onClose={() => setIsNotesModalOpen(false)}
-          student={{ name: student.name, notes: student.notes ? student.notes.map((note, index) => ({ id: index.toString(), value: note })) : undefined }}
-          notes={student.notes ? student.notes.map((note, index) => ({ id: index.toString(), value: note })) : undefined}
+          student={{
+            name: student.name,
+            notes: student.notes
+              ? student.notes.map((note, index) => ({
+                  id: index.toString(),
+                  value: note,
+                }))
+              : undefined,
+          }}
+          notes={
+            student.notes
+              ? student.notes.map((note, index) => ({
+                  id: index.toString(),
+                  value: note,
+                }))
+              : undefined
+          }
         />
       )}
     </>
