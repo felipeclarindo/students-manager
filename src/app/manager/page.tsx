@@ -8,7 +8,6 @@ import { StudentItem } from "@/components/StudentItem";
 import { ErrorNotification } from "@/components/ui/ErrorNotification";
 import { AddModal } from "@/components/ui/modals/AddModal";
 import { SuccessNotification } from "@/components/ui/SuccessNotification";
-import { StudentProps } from "@/interfaces";
 import { useStudents } from "@/actions/students-actions";
 
 export default function ManagerPage() {
@@ -16,20 +15,11 @@ export default function ManagerPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<StudentProps | null>(
-    null
-  );
-  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
 
   useEffect(() => {
     fetchStudents();
-  }, [fetchStudents]);
+  }, []);
 
-  const handleViewNotes = (student: StudentProps) => {
-    setSelectedStudent(student);
-    setIsNotesModalOpen(true);
-  };
-  
   const handleAddClick = () => {
     setIsAddModalOpen(true);
   };
@@ -54,15 +44,16 @@ export default function ManagerPage() {
       <main className="flex justify-center items-center min-h-[70vh]">
         <div className="flex-col items-center justify-center p-10 bg-gray-200 m-4 rounded min-w-[70vw] shadow-lg">
           <div className="flex items-start mb-4">
-            <div className="flex-col mr-8 min-w-[220px] p-4">
+            <div className="flex flex-col mr-8 min-w-[220px] p-4">
               <h2 className="text-xl font-semibold mb-2 text-center">
                 Manager
               </h2>
               <hr className="border-t-2 border-black" />
-              <div className="flex flex-col mt-4 space-y-2 gap-1">
+              <div className="flex flex-col mt-4 space-y-2">
                 <CustomButton text="Add" onClick={handleAddClick} />
               </div>
             </div>
+
             <div className="flex-grow">
               <div className="border border-gray-400 rounded">
                 <table className="min-w-full border-collapse">
@@ -95,11 +86,17 @@ export default function ManagerPage() {
                           </tr>
                         );
                       }
+
                       if (students && students.length > 0) {
-                        return students.map((student: StudentProps) => (
-                          <StudentItem key={student.id} {...student} />
+                        return students.map((student) => (
+                          <StudentItem
+                            key={student.id}
+                            {...student}
+                            onEdit={() => console.log("Edit", student)}
+                          />
                         ));
                       }
+
                       return (
                         <tr>
                           <td colSpan={6} className="text-center px-4 py-2">
@@ -111,6 +108,7 @@ export default function ManagerPage() {
                   </tbody>
                 </table>
               </div>
+
               <div className="mt-4 ml-2">
                 {error && (
                   <ErrorNotification
@@ -133,6 +131,7 @@ export default function ManagerPage() {
           </div>
         </div>
       </main>
+
       {isAddModalOpen && (
         <AddModal
           isOpenModal={isAddModalOpen}
