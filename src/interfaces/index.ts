@@ -1,5 +1,12 @@
 import { MouseEvent } from "react";
 
+export interface EditModalProps {
+  isOpenModal: boolean;
+  onClose: () => void;
+  student: StudentProps;
+  onSuccess?: () => void;
+}
+
 export interface NotesModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -35,7 +42,7 @@ export interface CustomButtonProps {
 }
 
 export interface StudentProps {
-  id?: number;
+  id: number;
   name: string;
   course: string;
   period: string;
