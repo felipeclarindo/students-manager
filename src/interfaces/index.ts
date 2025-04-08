@@ -1,18 +1,48 @@
+import { MouseEvent } from "react";
+
+export interface NotesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  student: {
+    name: string;
+    notes?: { id: string; value: number }[];
+  };
+  notes?: { id: string; value: number }[];
+}
+
+export interface DeleteConfirmationProps {
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
 export interface NavBarProps {
   active: "Dashboard" | "Home" | "Manager";
 }
 
+export interface ErrorNotificationProps {
+  message: string;
+  onClose: () => void;
+  addClass?: string;
+  duration?: number;
+}
+
 export interface CustomButtonProps {
   text: string;
+  type?: "button" | "submit" | "reset";
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   customClass?: string;
-  type?: "submit" | "reset";
-  onClick?: () => void;
+  addClass?: string;
 }
 
 export interface StudentProps {
-  id: number;
+  id?: number;
   name: string;
   course: string;
-  grade: string;
   period: string;
+  notes: number[] | null;
+}
+
+export interface LoadingSpinnerProps {
+  size?: string;
+  color?: string;
 }
